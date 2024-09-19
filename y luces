@@ -1,0 +1,19 @@
+Con este código se hace que las luces se prendan en código binario, ya que comienza en 0 y se le suma de a un bit.
+Es una especie de "código morse" pero que representa números en binario.
+
+PB EQU 31H
+CB EQU 33H
+
+org 2000h
+MOV DL, 00000000B; DL será utilizado para incrementar los bits de AL
+MOV AL, 00000000B; Se le da el valor 0 a Al para luego utilizarlo en CB
+OUT CB, AL; De esta manera, se "inicia" a CB en 0, asegurándonos que las luces estén apagadas.
+
+LOOP: 
+MOV AL, DL; DL se incrementará a medida que el loop llegue al final, por eso se escribe su valor en AL
+OUT PB, AL; Se pasa la información de AL a PB. Se usa OUT porque PB es E/S
+ADD DL, 00000001B; Se uma 1 bit a DL
+CMP AL, 11111111B; Compara Al. Si todos los bits son 1, da cero
+JNZ LOOP; Mientras la cuenta anterior no de cero, se vuelve a LOOP.
+INT 0; Interrupción por software
+end
