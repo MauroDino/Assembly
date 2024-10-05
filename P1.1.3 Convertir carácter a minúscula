@@ -5,7 +5,6 @@ misma que la distancia entre la “Z” y la “z”.
 
 org 1000h
 C DB 'J'
-RES DB ?
 
 ORG 2000H
 MOV AL, C
