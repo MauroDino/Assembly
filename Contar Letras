@@ -17,6 +17,7 @@ COMPARAR: MOV AH, [BX]
           CMP AH, DL
           JNZ SIGO
           INC CH
+          MOV CANT, CH
 SIGO: INC BX
       DEC CL
       JNZ COMPARAR
