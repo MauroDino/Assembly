@@ -1,0 +1,27 @@
+CONTAR_CAR Recibe la dirección de comienzo de un string en BX, su longitud en AL, y el
+carácter a contar en AH. Retorna en CL la cantidad de veces que aparece el carácter.
+
+org 1000h
+MENSAJE DB "HOLA, BUEN DIA"
+FIN_MENSAJE DB ?
+CANT DB ?
+
+ORG 3000H
+CONTAR_CAR: MOV CL, 0
+      SIGO: MOV AH, [BX]
+            CMP AH, AL
+            JNZ SALTAR
+            INC CL
+    SALTAR: INC BX
+            DEC DL
+            JNZ SIGO
+            RET
+    
+ORG 2000H
+MOV BX, OFFSET MENSAJE
+MOV DL, OFFSET FIN_MENSAJE - OFFSET MENSAJE
+MOV AL, 'A'
+CALL CONTAR_CAR
+INT 0
+
+END
