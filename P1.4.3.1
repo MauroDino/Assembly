@@ -1,0 +1,22 @@
+ES_MAYUS Recibe un carácter en el registro AL y retorna en AH el valor 0FFh si es mayúscula y 0
+de lo contrario.
+
+org 1000h
+C DB 'J'
+RES DB ?
+
+ORG 3000H
+ES_MAYUS: CMP C, 61H
+          JS ESMA
+          MOV AH, 0
+          JMP VUELVE
+    ESMA: MOV AH, 0FFH
+          MOV RES, AH
+  VUELVE: RET
+
+ORG 2000H
+MOV AL, C
+CALL ES_MAYUS
+INT 0
+
+END
