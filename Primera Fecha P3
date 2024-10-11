@@ -1,0 +1,72 @@
+;Escribir un programa para VonSim que cuente la cantidad de valores pares de un vector de números de 16 bits.
+;Luego deberá informar "Ganan los pares" si hay más valores pares que impares o "Ganan los impares" en caso contrario.
+;Para ello deberá implementar las subrutinas:
+;    es_par: recibe en CX un número y devuelve en DX el valor 1 si es par y el valor 0 si es impar.
+;    contar_pares: recibe a través de la pila la dirección de memoria donde empieza un vector, y además su longitud.
+;                  Retorna la cantidad de valores pares del vector en el registro CX.
+
+MASK EQU 00000001
+PAR EQU 00000000
+
+org 1000h
+VECTOR DW 50, 15, 25, 12, 3, 5, 4, 3, 1
+GANAN_LOS_PARES DB "GANAN LOS PARES"
+GANAN_LOS_IMPARES DB "GANAN LOS IMPARES"
+CANTIDAD_PAR DB ?
+
+
+ORG 3000H
+ ES_PAR: MOV DX, 0
+         AND CX, MASK
+         JNZ RES_IMP
+         JMP RES_PAR
+RES_IMP: MOV DX, 0
+         JMP FINAL
+RES_PAR: MOV DX, 1
+         JMP FINAL
+  FINAL: RET
+        
+ORG 3200H
+CANT_PARES: MOV DX, [BX]
+            AND DX, MASK
+            CMP DX, PAR       
+            JNZ SUMO_IMPAR
+            JMP SUMO_PAR
+SUMO_IMPAR: ADD AH, 1
+            DEC BX
+            DEC AL
+            JNZ CANT_PARES
+            JMP FINI
+  SUMO_PAR: ADD CX, 1
+            DEC BX
+            DEC AL
+            JNZ CANT_PARES
+            JMP FINI
+      FINI: RET
+
+ORG 2000H
+MOV BX, OFFSET VECTOR
+MOV AL, OFFSET GANAN_LOS_PARES - OFFSET VECTOR
+MOV CX, [BX]
+LOOP: CALL ES_PAR
+      INC BX
+      DEC AL
+      JNZ LOOP
+MOV BX, OFFSET VECTOR
+MOV AL, OFFSET GANAN_LOS_PARES - OFFSET VECTOR
+CALL CANT_PARES
+MOV AL, AH
+MOV AH, 0
+IMPRIMIR: SUB AX, CX
+          JNS IMP_IMP
+          JMP IMP_PAR
+ IMP_IMP: MOV BX, OFFSET GANAN_LOS_IMPARES  
+          MOV AL, OFFSET CANTIDAD_PAR - OFFSET GANAN_LOS_IMPARES  
+          INT 7
+          JMP FIN
+ IMP_PAR: MOV BX, OFFSET GANAN_LOS_PARES 
+          MOV AL, OFFSET GANAN_LOS_IMPARES - OFFSET GANAN_LOS_PARES
+          INT 7
+
+FIN: INT 0    
+    END
