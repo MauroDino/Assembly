@@ -1,0 +1,51 @@
+* daddi $t1, $t2, -1 ; Suma valor negativo. $t2 - 1 => se guarda en $t1
+
+* daddi $t1, $zero, 5 ; Asignación valor inmediato. 0 + 5 => se guarda en $t1
+
+* dadd $t1, $t2, $t3 ; Suma de registros
+
+* dadd $t1, $t2, $zero ; Asignación de registro. $t2 + 0 => se guarda en $t1
+
+Parar recorrer un vector:
+Bucle: ld $t1, mi_var ($v0)
+       daddi $v0, $v0, 8 ; Desplaza al próximo elemento
+
+ATENCIÓN: si se trata de un string, el desplazamiento es de a 1 byte:
+loop: lb $a0, 0 ($s0) ; Toma el caracter actual
+      ...
+      ...
+      daddi $s0, $s0, 1 ; Avanza al siguiente caracter
+
+Pasaje por referencia y por pila
+.code
+daddi $sp, $0, 0x400; pimero se debe inicializar la pila:
+daddi $t0, $0, base
+daddi $t1, $0, exponente
+
+Pasaje por valor y por registro
+ld $a0, base ($zero)
+ld $a1, exponente ($zero)
+
+Si se usa rutina anidada (una rutina dentro de otra), antes de llamar a la segunda, se debe preservar $ra (Return Adress) de la primera
+
+Ejemplo de cómo "apilar" (preservar) en la pila:
+daddi $sp, $sp, -24
+sd $ra, 16 ($sp)
+sd $s1, 8 ($sp)
+sd $s1, 0 ($sp)
+Antes del RA se debe "desapilar"
+ld $s1, 0 ($sp)
+
+
+Pasar un string a minúscula:
+upcase: dadd $v0, $a0, $zero ; $a0 es el valor que toma la subrutina, se le suma cero y se lo guarda en $v0 que es la variable que va a devolver.
+        slti $t0, $v0, 0x61 ; Compara con 'a'. Resta lo que contiene la variable "$v0$ a 0x61 (a en hexa) y si es el primero es menor al segundo, guarda 1 en $t0
+        bnez $t0, salir ; Si el resultado de la comparación anterior no es 0 (bnez) salta a la etiqueta salir
+        slti $t0, $v0, 0x78 ; Compara con el caracter que le sigue a 'z'. Hace la resta y si es el primero es menor al segundo, guarda 1 en $t0
+        beqz $t0, salir ; Si lo que contiene $t0 es igual a 0 (beqz) entonces salta a la etiqueta salir
+        daddi $v0, $v0, -0x20 ; Si llegó hasta acá, se comprobó que el caracter el mayúscula y lo convierte en minúscula
+salir: jr $ra
+
+ld $s0, 8 ($sp)
+ld $ra, 16 ($sp)
+
